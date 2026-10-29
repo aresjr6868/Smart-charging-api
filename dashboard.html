@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>CharServer Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#0d0f14;--card:#1e2130;--border:#2a2f45;--accent:#7c6aff;--accent2:#00d4aa;--warn:#ff6b6b;--text:#e2e8f0;--muted:#64748b;--green:#22c55e;--yellow:#eab308}
+body{font-family:Inter,sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+header{background:linear-gradient(135deg,#1a1040,#0d1a2e);border-bottom:1px solid var(--border);padding:20px 32px;display:flex;align-items:center;gap:16px;position:sticky;top:0;z-index:100}
+.logo{width:40px;height:40px;background:linear-gradient(135deg,var(--accent),var(--accent2));border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px}
+h1{font-size:1.25rem;font-weight:700;background:linear-gradient(90deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.badge{margin-left:auto;display:flex;align-items:center;gap:8px;background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.3);padding:6px 14px;border-radius:20px;font-size:.8rem;color:var(--green)}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--green);animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+.wrap{max-width:1400px;margin:0 auto;padding:28px 32px;display:grid;grid-template-columns:1fr 1fr;gap:24px}
+@media(max-width:900px){.wrap{grid-template-columns:1fr}}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;grid-column:1/-1}
+.stat{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px}
+.slbl{font-size:.75rem;color:var(--muted);margin-bottom:4px}
+.sval{font-size:1.4rem;font-weight:700;font-family:"JetBrains Mono",monospace}
+.cp{color:var(--accent)}.ct{color:var(--accent2)}.cg{color:var(--green)}
+.card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:24px;transition:border-color .2s}
+.card:hover{border-color:var(--accent)}
+.chdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px}
+.cttl{font-size:.95rem;font-weight:600;display:flex;align-items:center;gap:8px}
+.ico{width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:14px}
+.ip{background:rgba(124,106,255,.15)}.it{background:rgba(0,212,170,.15)}.iy{background:rgba(234,179,8,.15)}
+textarea{width:100%;background:#0a0c10;border:1px solid var(--border);color:#a9d4ff;font-family:"JetBrains Mono",monospace;font-size:.82rem;border-radius:10px;padding:14px;resize:vertical;min-height:200px;outline:none;line-height:1.6;transition:border-color .2s}
+textarea:focus{border-color:var(--accent)}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:9px 18px;border-radius:8px;border:none;cursor:pointer;font-size:.85rem;font-weight:500;transition:all .2s;font-family:inherit}
+.bp{background:linear-gradient(135deg,var(--accent),#5b47ff);color:#fff}
+.bp:hover{transform:translateY(-1px);box-shadow:0 4px 15px rgba(124,106,255,.4)}
+.bt{background:linear-gradient(135deg,var(--accent2),#00a882);color:#000}
+.bt:hover{transform:translateY(-1px);box-shadow:0 4px 15px rgba(0,212,170,.3)}
+.bd{background:rgba(255,107,107,.15);color:var(--warn);border:1px solid rgba(255,107,107,.3)}
+.bd:hover{background:rgba(255,107,107,.25)}
+.bsm{padding:6px 12px;font-size:.78rem}
+.brow{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
+.loglist{max-height:320px;overflow-y:auto;display:flex;flex-direction:column;gap:6px}
+.logitem{background:#0d0f14;border:1px solid var(--border);border-radius:8px;padding:10px 14px;font-family:"JetBrains Mono",monospace;font-size:.76rem;line-height:1.5}
+.loglist::-webkit-scrollbar{width:4px}
+.loglist::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px}
+#toast{position:fixed;bottom:28px;right:28px;padding:12px 20px;border-radius:10px;font-size:.85rem;font-weight:500;transition:all .3s;opacity:0;transform:translateY(8px);pointer-events:none;z-index:999}
+#toast.show{opacity:1;transform:translateY(0)}
+#toast.ok{background:#14532d;border:1px solid var(--green);color:var(--green)}
+#toast.err{background:#450a0a;border:1px solid var(--warn);color:var(--warn)}
+.full{grid-column:1/-1}
+.albl{font-family:"JetBrains Mono",monospace;font-size:.8rem;color:var(--accent2);background:#0a0c10;padding:8px 14px;border-radius:8px;border:1px solid var(--border);margin-bottom:14px;word-break:break-all}
+.egrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px}
+.ep{background:#0d0f14;border:1px solid var(--border);border-radius:10px;padding:14px}
+.mb{padding:2px 8px;border-radius:4px;font-size:.7rem;font-weight:700;font-family:"JetBrains Mono",monospace}
+</style>
+</head>
+<body>
+<header>
+  <div class="logo">&#9889;</div>
+  <div><h1>CharServer Dashboard</h1><div style="font-size:.75rem;color:#64748b">Python API &middot; Unity Sync Bridge</div></div>
+  <div class="badge"><span class="dot"></span> Server Running</div>
+</header>
+<div class="wrap">
+  <div class="stats">
+    <div class="stat"><div class="slbl">Tong lan sync</div><div class="sval cp" id="ns">-</div></div>
+    <div class="stat"><div class="slbl">So keys du lieu</div><div class="sval ct" id="nk">-</div></div>
+    <div class="stat"><div class="slbl">Lan sync gan nhat</div><div class="sval cg" id="ls" style="font-size:.9rem">-</div></div>
+  </div>
+  <div class="card">
+    <div class="chdr"><div class="cttl"><div class="ico ip">&#128230;</div>Du lieu Server hien tai</div><span id="rt" style="font-size:.72rem;color:#64748b"></span></div>
+    <div class="albl">GET &rarr; http://localhost:5000/api/data</div>
+    <textarea id="sj" rows="10" readonly placeholder="Dang tai..."></textarea>
+    <div class="brow">
+      <button class="btn bp bsm" onclick="loadData()">&#8635; Refresh</button>
+      <button class="btn bd bsm" onclick="clearData()">&#128465; Reset</button>
+    </div>
+  </div>
+  <div class="card">
+    <div class="chdr"><div class="cttl"><div class="ico it">&#9998;</div>Cap nhat du lieu Server</div></div>
+    <div class="albl">PUT &rarr; http://localhost:5000/api/data</div>
+    <textarea id="ej" rows="10" placeholder="{ &quot;key&quot;: &quot;value&quot; }"></textarea>
+    <div class="brow">
+      <button class="btn bt" onclick="pushData()">&#128228; Gui len Server</button>
+      <button class="btn bp bsm" onclick="fmtJson()">&#10024; Format JSON</button>
+    </div>
+  </div>
+  <div class="card full">
+    <div class="chdr">
+      <div class="cttl"><div class="ico iy">&#128203;</div>Lich su Sync</div>
+      <button class="btn bsm" style="background:#161920;color:#64748b" onclick="loadLogs()">&#8635; Tai lai</button>
+    </div>
+    <div class="albl">GET &rarr; http://localhost:5000/api/logs</div>
+    <div class="loglist" id="ll"><div style="color:#64748b;text-align:center;padding:32px;font-size:.85rem">Chua co log nao.</div></div>
+  </div>
+  <div class="card full">
+    <div class="chdr"><div class="cttl"><div class="ico ip">&#128225;</div>API Endpoints</div></div>
+    <div class="egrid">
+      <div class="ep"><div style="display:flex;gap:8px;align-items:center;margin-bottom:6px"><span class="mb" style="background:#7c6aff;color:#fff">POST</span><code style="color:#00d4aa;font-size:.8rem">/api/sync</code></div><div style="color:#64748b;font-size:.78rem">Unity gui JSON, server merge va tra ve state moi</div></div>
+      <div class="ep"><div style="display:flex;gap:8px;align-items:center;margin-bottom:6px"><span class="mb" style="background:#22c55e;color:#000">GET</span><code style="color:#00d4aa;font-size:.8rem">/api/data</code></div><div style="color:#64748b;font-size:.78rem">Lay toan bo server state hien tai</div></div>
+      <div class="ep"><div style="display:flex;gap:8px;align-items:center;margin-bottom:6px"><span class="mb" style="background:#eab308;color:#000">PUT</span><code style="color:#00d4aa;font-size:.8rem">/api/data</code></div><div style="color:#64748b;font-size:.78rem">Cap nhat server state (Unity nhan o lan sync tiep)</div></div>
+      <div class="ep"><div style="display:flex;gap:8px;align-items:center;margin-bottom:6px"><span class="mb" style="background:#ff6b6b;color:#fff">DELETE</span><code style="color:#00d4aa;font-size:.8rem">/api/data</code></div><div style="color:#64748b;font-size:.78rem">Reset toan bo server state ve rong</div></div>
+      <div class="ep"><div style="display:flex;gap:8px;align-items:center;margin-bottom:6px"><span class="mb" style="background:#22c55e;color:#000">GET</span><code style="color:#00d4aa;font-size:.8rem">/api/logs</code></div><div style="color:#64748b;font-size:.78rem">Lich su sync (?limit=N)</div></div>
+      <div class="ep"><div style="display:flex;gap:8px;align-items:center;margin-bottom:6px"><span class="mb" style="background:#a3a3a3;color:#000">GET</span><code style="color:#00d4aa;font-size:.8rem">/api/status</code></div><div style="color:#64748b;font-size:.78rem">Health-check va thong tin server</div></div>
+    </div>
+  </div>
+</div>
+<div id="toast"></div>
+<script>
+var BASE="";
+function toast(m,t){var e=document.getElementById("toast");e.textContent=m;e.className="show "+(t||"ok");setTimeout(function(){e.className=""},2800);}
+async function loadData(){
+  try{
+    var r=await fetch(BASE+"/api/data"),d=await r.json();
+    document.getElementById("sj").value=JSON.stringify(d,null,2);
+    document.getElementById("rt").textContent="Updated "+new Date().toLocaleTimeString("vi-VN");
+    document.getElementById("nk").textContent=Object.keys(d).filter(function(k){return !k.startsWith("_")}).length;
+    if(d._last_sync) document.getElementById("ls").textContent=new Date(d._last_sync).toLocaleTimeString("vi-VN");
+  }catch(e){toast("Loi: "+e.message,"err");}
+}
+async function loadLogs(){
+  try{
+    var r=await fetch(BASE+"/api/logs?limit=30"),logs=await r.json();
+    var el=document.getElementById("ll");
+    if(!logs.length){el.innerHTML="<div style=\"color:#64748b;text-align:center;padding:32px;font-size:.85rem\">Chua co log nao.</div>";return;}
+    var html="";
+    for(var i=0;i<logs.length;i++){
+      var l=logs[i];
+      var t=new Date(l.time||"").toLocaleTimeString("vi-VN");
+      var a=l.action||"?";
+      var p=l.payload?JSON.stringify(l.payload).substring(0,80)+"...":"";
+      var clsMap={sync:"background:rgba(124,106,255,.2);color:#7c6aff",manual_update:"background:rgba(234,179,8,.2);color:#eab308",clear:"background:rgba(255,107,107,.2);color:#ff6b6b"};
+      var cls=clsMap[a]||"background:#333;color:#fff";
+      html+="<div class=\"logitem\"><span style=\"color:#64748b;margin-right:8px\">"+t+"</span><span style=\"padding:2px 8px;border-radius:4px;font-size:.7rem;font-weight:600;"+cls+"\">"+a.toUpperCase()+"</span>"+(l.client?"<span style=\"color:#7c6aff;margin-left:8px\">"+l.client+"</span>":"")+"<span style=\"color:#64748b;display:block;margin-top:4px\">"+p+"</span></div>";
+    }
+    el.innerHTML=html;
+    var syncs=logs.filter(function(l){return l.action==="sync";}).length;
+    document.getElementById("ns").textContent=syncs+"+";
+  }catch(e){toast("Log loi: "+e.message,"err");}
+}
+async function pushData(){
+  var raw=document.getElementById("ej").value.trim();
+  if(!raw){toast("JSON trong!","err");return;}
+  var p;try{p=JSON.parse(raw);}catch(e){toast("JSON khong hop le: "+e.message,"err");return;}
+  try{
+    var r=await fetch(BASE+"/api/data",{method:"PUT",headers:{"Content-Type":"application/json"},body:JSON.stringify(p)});
+    if(r.ok){toast("Da cap nhat server!");loadData();loadLogs();}else toast("Loi: "+r.status,"err");
+  }catch(e){toast("Loi ket noi: "+e.message,"err");}
+}
+async function clearData(){
+  if(!confirm("Xoa toan bo server state?"))return;
+  await fetch(BASE+"/api/data",{method:"DELETE"});
+  toast("Da reset!");loadData();loadLogs();
+}
+function fmtJson(){
+  var ta=document.getElementById("ej");
+  try{ta.value=JSON.stringify(JSON.parse(ta.value),null,2);toast("Formatted!");}
+  catch(e){toast("JSON loi: "+e.message,"err");}
+}
+setInterval(function(){loadData();loadLogs();},5000);
+loadData();loadLogs();
+</script>
+</body>
+</html>

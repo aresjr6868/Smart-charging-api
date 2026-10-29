@@ -1,0 +1,24 @@
+{
+  "electrical": {
+    "voltage_v": 420,
+    "current_a": 69,
+    "power_kw": 25.2,
+    "energy_total_kwh": 1300,
+    "frequency_hz": 50
+  },
+  "thermal": {
+    "connector_temp_c": 35,
+    "inverter_temp_c": 40,
+    "ambient_temp_c": 30,
+    "cooling_fan_speed_rpm": 1200
+  },
+  "session": {
+    "status": "CHARGING",
+    "vehicle_soc": 80,
+    "session_duration_sec": 900,
+    "est_time_remaining_sec": 1800
+  },
+  "type_connect": "type_connect_2",
+  "_last_sync": "2026-10-22T12:47:05.426128",
+  "_last_modified": "2026-10-22T12:46:58.594323"
+}
